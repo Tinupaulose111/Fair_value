@@ -1,0 +1,37 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual env
+.venv/
+env/
+venv/
+
+# OS/IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Ignore local datasets, mounted separately
+data/
+*.csv
+*.xlsx
+
+# Exclude other services
+../api/
+../drift/
+../metrics/
+../train_old/
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml

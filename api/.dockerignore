@@ -1,0 +1,56 @@
+# ----------------------------
+# OS / cache
+# ----------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+Thumbs.db
+
+# ----------------------------
+# Virtual envs
+# ----------------------------
+.venv/
+venv/
+env/
+
+# ----------------------------
+# Git
+# ----------------------------
+.git/
+.github/
+
+# ----------------------------
+# Build artifacts
+# ----------------------------
+build/
+dist/
+*.egg-info/
+
+# ----------------------------
+# Data (exclude)
+# ----------------------------
+*.csv
+*.xlsx
+*.parquet
+data/
+datasets/
+raw_data/
+
+# ----------------------------
+# Training / drift (exclude)
+# ----------------------------
+trainer/
+drift/
+metrics/
+train_model.py
+train_old/
+drift_artifacts/
+
+# ----------------------------
+# ALLOW runtime essentials
+# ----------------------------
+!api/**
+!core/**
+!model/**

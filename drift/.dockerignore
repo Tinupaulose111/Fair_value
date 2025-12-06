@@ -1,0 +1,37 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual env
+.venv/
+env/
+venv/
+
+# OS/IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Drift detector reads datasets via mounted volume → ignore local copies
+data/
+*.csv
+*.xlsx
+
+# Exclude other project folders
+../api/
+../trainer/
+../metrics/
+../train_old/
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml

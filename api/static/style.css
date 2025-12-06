@@ -1,0 +1,119 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: #1a1a1a;
+}
+
+form {
+    margin-bottom: 20px;
+}
+input[type="text"] {
+    padding: 8px;
+    width: 200px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+input[type="submit"] {
+    padding: 8px 16px;
+    margin-left: 10px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}
+input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* Horizontal container */
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+/* Prediction box */
+.prediction-box {
+    flex: 1;
+    min-width: 220px;
+    background-color: #fff;
+    border: 2px solid #4CAF50;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+}
+.prediction-box h3, .prediction-box h4 {
+    color: #4CAF50;
+    margin-bottom: 10px;
+}
+.prediction-box p {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+/* Ratios section */
+.ratios-box {
+    flex: 2;
+    min-width: 300px;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+.ratios-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.ratio-card {
+    flex: 1 1 120px;
+    background-color: #e8f5e9;
+    border: 1px solid #4CAF50;
+    border-radius: 6px;
+    padding: 10px;
+    text-align: center;
+}
+.ratio-card h4 {
+    margin-bottom: 5px;
+    color: #388E3C;
+}
+.ratio-card p {
+    font-weight: bold;
+}
+
+/* Table box */
+.table-box {
+    flex: 3;
+    min-width: 300px;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    overflow-x: auto;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+th {
+    background-color: #f0f0f0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .container {
+        flex-direction: column;
+    }
+}

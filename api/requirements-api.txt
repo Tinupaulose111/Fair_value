@@ -1,0 +1,16 @@
+Flask==3.1.2
+flask-cors==6.0.1
+gunicorn==23.0.0
+
+numpy==2.3.5
+pandas==2.3.3
+
+requests==2.32.5
+beautifulsoup4==4.14.3
+yfinance==0.2.66
+dill==0.4.0
+python-dateutil==2.9.0.post0
+multitasking==0.0.11
+frozendict==2.4.7
+scikit-learn==1.7.2
+xgboost==3.1.2
