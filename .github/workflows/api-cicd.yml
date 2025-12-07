@@ -83,8 +83,8 @@ jobs:
 
             docker pull $IMAGE
 
-            docker stop fairvalue-api || true
-            docker rm fairvalue-api || true
+            # ✅ FIX: force-remove existing container
+            docker rm -f fairvalue-api || true
 
             docker run -d \
               --name fairvalue-api \
