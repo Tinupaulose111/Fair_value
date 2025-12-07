@@ -1,1 +1,1 @@
-# Fair_value
+[![CI/CD — API Service](https://github.com/Tinupaulose111/Fair_value/actions/workflows/api-cicd.yml/badge.svg)](https://github.com/Tinupaulose111/Fair_value/actions/workflows/api-cicd.yml)
