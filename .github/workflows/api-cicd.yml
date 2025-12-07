@@ -57,10 +57,11 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Smoke test API image
-        run: |
-          docker run --rm \
-            ghcr.io/${{ env.OWNER }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
-            python -c "from app import app; print('API OK')"
+  run: |
+    docker run --rm \
+      ghcr.io/${{ env.OWNER }}/${{ env.IMAGE_NAME }}:latest \
+      python -c "from app import app; print('API OK')"
+
 
       - name: Deploy API to Oracle VM
         uses: appleboy/ssh-action@v0.1.10
@@ -72,7 +73,7 @@ jobs:
           script: |
             set -e
 
-            IMAGE="ghcr.io/${{ env.OWNER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+            IMAGE="ghcr.io/${{ env.OWNER }}/${{ env.IMAGE_NAME }}:latest"
             PROJECT_DIR="/home/${{ secrets.SSH_USER }}/fairvalue_new"
 
             echo "Deploying $IMAGE"
