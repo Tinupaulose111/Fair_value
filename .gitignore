@@ -176,14 +176,14 @@ __marimo__/
 #######################################################
 
 # Data files (usually large / not needed in git)
-data/
+#data/
 
 # Old training experiments (if not needed)
 train_old/
 
 # Model artifacts, metrics outputs (often generated)
 metrics/
-model/
+#model/
 
 # Logs, temp files
 *.log
