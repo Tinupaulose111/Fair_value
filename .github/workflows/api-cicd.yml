@@ -43,7 +43,7 @@ jobs:
           images: |
             ghcr.io/${{ env.OWNER }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=sha
+            type=sha,format=short
             type=raw,value=latest
 
       - name: Build & push API image
@@ -57,11 +57,10 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Smoke test API image
-  run: |
-    docker run --rm \
-      ghcr.io/${{ env.OWNER }}/${{ env.IMAGE_NAME }}:latest \
-      python -c "from app import app; print('API OK')"
-
+        run: |
+          docker run --rm \
+            ghcr.io/${{ env.OWNER }}/${{ env.IMAGE_NAME }}:latest \
+            python -c "from app import app; print('API import successful')"
 
       - name: Deploy API to Oracle VM
         uses: appleboy/ssh-action@v0.1.10
@@ -96,3 +95,4 @@ jobs:
               -v $PROJECT_DIR/metrics:/app/metrics \
               -v $PROJECT_DIR/drift_artifacts:/app/drift_artifacts \
               $IMAGE
+
