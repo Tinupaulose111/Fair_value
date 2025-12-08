@@ -20,13 +20,12 @@ from core.metrics_logger import log_metrics
 
 
 # =========================================================
-# PATH SETUP (Docker-safe)
+# PATH SETUP (repo / Docker safe)
 # =========================================================
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))  # /app/drift
-PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, ".."))  # /app
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))      # .../drift
+PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, ".."))  # repo root (/app in Docker)
 
 RETRAIN_SCRIPT = os.path.join(PROJECT_ROOT, "trainer", "retrain_model.py")
-
 
 # =========================================================
 # CONFIG
@@ -35,9 +34,9 @@ OLD_FILE = os.path.join(PROJECT_ROOT, "data", "Marketdata_newdata.csv")
 NEW_FILE = os.path.join(PROJECT_ROOT, "data", "Marketdata_newdata_update.csv")
 MODEL_PATH = os.path.join(PROJECT_ROOT, "model", "final_model_fairvalue.pkl")
 
+# Artifacts are written inside the repo workspace (allowed in GitHub runner)
 ARTIFACT_DIR = Path(PROJECT_ROOT) / "drift_artifacts"
 ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
-
 
 DRIFT_REPORT_PATH = ARTIFACT_DIR / "drift_report.json"
 DRIFT_LOG = ARTIFACT_DIR / "drift_detection.log"
@@ -57,8 +56,8 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
         logging.FileHandler(DRIFT_LOG),
-        logging.StreamHandler()
-    ]
+        logging.StreamHandler(),
+    ],
 )
 logger = logging.getLogger("drift_monitor")
 
@@ -68,17 +67,18 @@ logger = logging.getLogger("drift_monitor")
 # =========================================================
 def trigger_github_trainer(overall_severity: float) -> Tuple[bool, dict]:
     """
-    Triggers GitHub retrain workflow via workflow_dispatch
+    Trigger the retrain GitHub Actions workflow (retrain.yml)
+    via workflow_dispatch.
     """
 
     owner = os.environ.get("REPO_OWNER")
     repo = os.environ.get("REPO_NAME")
     workflow_file = os.environ.get("TRAINER_WORKFLOW")
     ref = os.environ.get("TARGET_BRANCH", "main")
-    token = os.environ.get("GHCR_PAT")
+    token = os.environ.get("GHCR_PAT")  # your secret name
 
     if not all([owner, repo, workflow_file, token]):
-        logger.error("❌ Missing required GitHub env vars")
+        logger.error("❌ Missing required GitHub env vars (REPO_OWNER / REPO_NAME / TRAINER_WORKFLOW / GHCR_PAT)")
         return False, {"error": "missing_env"}
 
     url = (
@@ -90,14 +90,14 @@ def trigger_github_trainer(overall_severity: float) -> Tuple[bool, dict]:
         "ref": ref,
         "inputs": {
             "reason": "data_drift_detected",
-            "overall_severity": f"{overall_severity:.2f}"
-        }
+            "overall_severity": f"{overall_severity:.2f}",
+        },
     }
 
     headers = {
         "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
 
     try:
@@ -129,6 +129,7 @@ def safe_load_pipeline(path: str):
     with open(path, "rb") as f:
         obj = dill.load(f)
 
+    # In your project you save {"pipeline": ..., "smearing_factor": ...}
     if isinstance(obj, dict) and "pipeline" in obj:
         return obj["pipeline"]
 
@@ -143,6 +144,7 @@ def clean_like_training(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_preprocessor(pipeline):
+    # Your training pipeline is [RowFilter -> FeatureEngineer -> Preprocessor -> Model]
     try:
         return pipeline[:-1]
     except Exception:
@@ -161,7 +163,8 @@ def transform(preproc, df: pd.DataFrame) -> pd.DataFrame:
 def feature_severity(old: pd.Series, new: pd.Series) -> float:
     ks_stat, _ = ks_2samp(old, new)
     mean_shift = abs(new.mean() - old.mean()) / (old.std() + 1e-9)
-    return float((0.7 * ks_stat + 0.3 * min(mean_shift / 3, 1)) * 100)
+    score = (0.7 * ks_stat + 0.3 * min(mean_shift / 3, 1)) * 100.0
+    return float(score)
 
 
 # =========================================================
@@ -170,14 +173,17 @@ def feature_severity(old: pd.Series, new: pd.Series) -> float:
 def main():
     logger.info("🚀 Drift detection started")
 
+    # Check required files
     for p in [OLD_FILE, NEW_FILE, MODEL_PATH]:
         if not os.path.exists(p):
             logger.error(f"❌ Missing required file: {p}")
             return
 
+    # Load data
     df_old = clean_like_training(pd.read_csv(OLD_FILE))
     df_new = clean_like_training(pd.read_csv(NEW_FILE))
 
+    # Load model pipeline and preprocessor
     pipeline = safe_load_pipeline(MODEL_PATH)
     preproc = get_preprocessor(pipeline)
 
@@ -197,13 +203,13 @@ def main():
         ks_stat, p_val = ks_2samp(old, new)
         sev = feature_severity(old, new)
 
-        drifted = p_val < DRIFT_P_THRESHOLD and ks_stat > DRIFT_KS_THRESHOLD
+        drifted = (p_val < DRIFT_P_THRESHOLD) and (ks_stat > DRIFT_KS_THRESHOLD)
 
         results[col] = {
             "p_value": float(p_val),
             "ks_stat": float(ks_stat),
             "severity": float(sev),
-            "drift": drifted
+            "drift": drifted,
         }
 
         severities.append(sev)
@@ -211,15 +217,15 @@ def main():
     overall_sev = float(np.mean(severities)) if severities else 0.0
 
     drift_detected = (
-        overall_sev >= OVERALL_SEVERITY_TRIGGER or
-        any(v["drift"] for v in results.values())
+        overall_sev >= OVERALL_SEVERITY_TRIGGER
+        or any(v["drift"] for v in results.values())
     )
 
     report = {
         "timestamp": now_utc(),
         "overall_severity": overall_sev,
         "drift_detected": drift_detected,
-        "features": results
+        "features": results,
     }
 
     with open(DRIFT_REPORT_PATH, "w") as f:
