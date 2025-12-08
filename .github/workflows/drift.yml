@@ -7,7 +7,7 @@ on:
 
 permissions:
   contents: read
-  actions: write
+  actions: write   # Required to trigger retrain workflow
 
 jobs:
   drift-check:
