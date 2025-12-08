@@ -7,7 +7,7 @@ on:
 
 permissions:
   contents: read
-  actions: write   # Needed to trigger retrain workflow
+  actions: write
 
 jobs:
   drift-check:
@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Install drift dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r drift/requirements-locked.txt || pip install -r drift/requirements.txt
