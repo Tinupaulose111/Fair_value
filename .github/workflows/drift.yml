@@ -26,11 +26,11 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements-locked.txt || pip install -r requirements.txt
+          pip install -r drift/requirements-locked.txt || pip install -r drift/requirements.txt
 
       - name: Run Drift Detection
         env:
-          GHCR_PAT: ${{ secrets.GHCR_PAT }}      # ✅ Correct
+          GHCR_PAT: ${{ secrets.GHCR_PAT }}
           REPO_OWNER: tinupaulose111
           REPO_NAME: Fair_value
           TRAINER_WORKFLOW: retrain.yml
