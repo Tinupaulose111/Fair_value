@@ -31,19 +31,19 @@ RETRAIN_SCRIPT = os.path.join(PROJECT_ROOT, "trainer", "retrain_model.py")
 # =========================================================
 # CONFIG
 # =========================================================
-OLD_FILE = "/app/data/Marketdata_newdata.csv"
-NEW_FILE = "/app/data/Marketdata_newdata_update.csv"
-MODEL_PATH = "/app/model/final_model_fairvalue.pkl"
+OLD_FILE = os.path.join(PROJECT_ROOT, "data", "Marketdata_newdata.csv")
+NEW_FILE = os.path.join(PROJECT_ROOT, "data", "Marketdata_newdata_update.csv")
+MODEL_PATH = os.path.join(PROJECT_ROOT, "model", "final_model_fairvalue.pkl")
 
-ARTIFACT_DIR = Path("/app/drift_artifacts")
+ARTIFACT_DIR = Path(PROJECT_ROOT) / "drift_artifacts"
 ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
+
 
 DRIFT_REPORT_PATH = ARTIFACT_DIR / "drift_report.json"
 DRIFT_LOG = ARTIFACT_DIR / "drift_detection.log"
 
 # Thresholds
-DRIFT_P_THRESHOLD = 0.05
-DRIFT_KS_THRESHOLD = 0.10
+DRIFT_P_THRESHOLD = 0.05DRIFT_KS_THRESHOLD = 0.10
 MIN_ROWS_REQUIRED = 30
 OVERALL_SEVERITY_TRIGGER = 20.0
 
