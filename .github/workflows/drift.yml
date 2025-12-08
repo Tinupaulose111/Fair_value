@@ -7,7 +7,7 @@ on:
 
 permissions:
   contents: read
-  actions: write   # Required to trigger retrain workflow
+  actions: write
 
 jobs:
   drift-check:
@@ -23,14 +23,15 @@ jobs:
         with:
           python-version: "3.12"
 
+      # ✅ THIS IS THE KEY FIX
+      - name: Set PYTHONPATH
+        run: |
+          echo "PYTHONPATH=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+
       - name: Install drift dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r drift/requirements-locked.txt || pip install -r drift/requirements.txt
-
-      - name: Set PYTHONPATH
-        run: |
-          echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
 
       - name: Run Drift Detection
         env:
