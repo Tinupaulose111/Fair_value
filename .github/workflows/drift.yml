@@ -1,0 +1,53 @@
+name: Drift Detection (Weekly)
+
+on:
+  schedule:
+    # Every Sunday at 02:00 UTC
+    - cron: "0 2 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write   # ✅ REQUIRED to trigger retrain workflow
+
+jobs:
+  drift-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      # -----------------------------
+      # Checkout repository
+      # -----------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # -----------------------------
+      # Set up Python
+      # -----------------------------
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # -----------------------------
+      # Install drift dependencies
+      # -----------------------------
+      - name: Install drift dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r drift/requirements-drift.txt
+
+      # -----------------------------
+      # Run Drift Detection
+      # -----------------------------
+      - name: Run Drift Monitor
+        env:
+          GHCR_PAT: ${{ secrets.GHCR_PAT }}   # ✅ FIXED
+          REPO_OWNER: ${{ secrets.REPO_OWNER }}
+          REPO_NAME: ${{ secrets.REPO_NAME }}
+          TRAINER_WORKFLOW: ${{ secrets.TRAINER_WORKFLOW }}
+          TARGET_BRANCH: ${{ secrets.TARGET_BRANCH }}
+        run: |
+          python drift/drift_monitor.py
+
