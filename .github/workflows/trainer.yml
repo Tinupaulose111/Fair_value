@@ -41,7 +41,7 @@ jobs:
       - name: Install training dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r trainer/requirements-train.txt
+          pip install -r trainer/requirements-locked.txt
 
       # -----------------------------
       # Run Retraining
