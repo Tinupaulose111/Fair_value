@@ -1,0 +1,79 @@
+name: Model Retrain & Deploy (Triggered by Drift)
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Why retraining triggered"
+        required: false
+        default: "manual"
+      overall_severity:
+        description: "Drift severity score"
+        required: false
+        default: "0"
+
+permissions:
+  contents: read
+
+jobs:
+  retrain-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      # -----------------------------
+      # Checkout code
+      # -----------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # -----------------------------
+      # Python setup
+      # -----------------------------
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # -----------------------------
+      # Install training dependencies
+      # -----------------------------
+      - name: Install training dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r trainer/requirements-train.txt
+
+      # -----------------------------
+      # Run Retraining
+      # -----------------------------
+      - name: Retrain model
+        run: |
+          echo "Retrain reason: ${{ inputs.reason }}"
+          echo "Overall severity: ${{ inputs.overall_severity }}"
+          python trainer/retrain_model.py
+
+      # -----------------------------
+      # Upload model to Oracle VM
+      # -----------------------------
+      - name: Copy model to Oracle VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "model/final_model_fairvalue.pkl"
+          target: "/home/${{ secrets.SSH_USER }}/fairvalue_new/model/"
+
+      # -----------------------------
+      # Restart API container (no rebuild)
+      # -----------------------------
+      - name: Restart API container
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            set -e
+            echo "Restarting API container to load new model..."
+            docker restart fairvalue-api
