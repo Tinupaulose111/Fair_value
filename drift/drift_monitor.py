@@ -215,7 +215,7 @@ def main():
         severities.append(sev)
 
     overall_sev = float(np.mean(severities)) if severities else 0.0
-    overall_sev = OVERALL_SEVERITY_TRIGGER * 1.2  # TEMP simulate drift
+    
 
     drift_detected = (
         overall_sev >= OVERALL_SEVERITY_TRIGGER
