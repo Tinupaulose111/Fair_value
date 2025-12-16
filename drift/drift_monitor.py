@@ -73,7 +73,7 @@ def trigger_github_trainer(overall_severity: float) -> Tuple[bool, dict]:
 
     owner = os.environ.get("REPO_OWNER")
     repo = os.environ.get("REPO_NAME")
-    workflow_file = os.environ.get("TRAINER_WORKFLOW")
+    workflow_file = "trainer.yml"
     ref = os.environ.get("TARGET_BRANCH", "main")
     token = os.environ.get("GHCR_PAT")  # your secret name
 
